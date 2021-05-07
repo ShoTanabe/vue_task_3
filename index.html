@@ -5,5 +5,111 @@
     <title>ToDoリスト</title>
   </head>
   <body>
+
+    <div id="app">
+      <h1>ToDoリスト</h1>
+      <form caction="index.html" method="post">
+        <div>
+          <label>
+            <input type="radio" name="radio_status" value="すべて" checked
+            v-model="checkedBtn">すべて
+          </label>
+          <label>
+            <input type="radio" name="radio_status" value="作業中"
+            v-model="checkedBtn">作業中
+          </label>
+          <label>
+            <input type="radio" name="radio_status" value="完了"
+            v-model="checkedBtn">完了
+          </label>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>コメント</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="task in selectedList">
+              <td>{{ task.taskId }}</td>
+              <td>{{ task.taskName }}</td>
+              <td>
+                <button type="button" name="status-btn"
+                @click="changeStatus(task)">{{ task.taskStatus }}</button>
+              </td>
+              <td>
+                <button type="button" name="delete-btn"
+                @click="deleteTask(task)">削除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <p style="font-weight:bold;">新しいタスクを入力</p>
+          <input type="text" name="task" ref="newTask">
+          <input type="button" value="追加"
+          @click="addTask">
+        </div>
+      </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script type="text/javascript">
+        var app = new Vue({
+          el: '#app',
+          data: {
+            taskList: [],
+            workingList: [],
+            finishList: [],
+            checkedBtn: 'すべて'
+          },
+          computed: {
+            selectedList() {
+              if(this.checkedBtn === 'すべて'){
+                return this.taskList;
+              }
+              else if(this.checkedBtn === '作業中'){
+                this.workingList = this.taskList.filter((task) => {
+                  return task.taskStatus === '作業中';
+                });
+                return this.workingList;
+              }
+              else{
+                this.finishList = this.taskList.filter((task) => {
+                  return task.taskStatus === '完了';
+                });
+                return this.finishList;
+              }
+            }
+          },
+          methods: {
+            addTask() {
+              this.taskList.push( {
+                taskId: this.taskList.length,
+                taskName: this.$refs.newTask.value,
+                taskStatus: '作業中'
+              } );
+              this.$refs.newTask.value = '';
+            },
+            changeStatus(task) {
+              if(task.taskStatus === '作業中') {
+                task.taskStatus = '完了';
+              } else {
+                task.taskStatus = '作業中';
+              };
+            },
+            deleteTask(task) {
+              let deleteNumber = this.taskList.indexOf(task);
+              this.taskList.splice(deleteNumber, 1);
+              this.taskList.forEach((task, index) => {
+                task.taskId = index;
+              });
+            }
+          }
+        })
+    </script>
+
   </body>
 </html>
